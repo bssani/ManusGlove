@@ -78,7 +78,8 @@ Plugins/ManusInteraction/
 │   │   │   ├── MIButtonInteractable.h     # 푸시 버튼 (선형 이동)
 │   │   │   ├── MIDialInteractable.h       # 다이얼/노브 (회전)
 │   │   │   ├── MISliderInteractable.h     # 슬라이더 (선형 범위)
-│   │   │   └── MISurfaceInteractable.h    # 터치 표면 (UV 좌표)
+│   │   │   ├── MISurfaceInteractable.h    # 터치 표면 (UV 좌표)
+│   │   │   └── MISteeringWheelComponent.h # 스티어링 휠 (양손 직접 회전)
 │   │   ├── Widget/
 │   │   │   └── MIWidgetSurface.h     # UMG 위젯 관통 방지
 │   │   └── Grab/
@@ -166,6 +167,21 @@ Plugins/ManusInteraction/
 - `WorldToSurfaceUV()`: 3D 월드 좌표 → 2D UV (0~1) 변환.
 - `OnSurfaceTouched`, `OnSurfaceMoved`, `OnSurfaceReleased` — 각각 finger name + UV + pressure 전달.
 - 멀티터치 지원: `GetActiveTouchCount()`.
+
+**MISteeringWheelComponent**
+- `UActorComponent`를 직접 상속 (물리 constraint 미사용, `SetRelativeRotation`으로 직접 회전).
+- `LeftHand`, `RightHand` (`TObjectPtr<AMIPhysicsHand>`): 양손 동시 그랩 지원. 한손 또는 양손으로 조작 가능.
+- `WheelMesh` (`TObjectPtr<UPrimitiveComponent>`): 회전시킬 대상 메시 컴포넌트.
+- `WheelRotationAxis` (EMIAxis X/Y/Z), `MaxLockAngle` (기본 ±450°): 회전 축 및 최대 잠금 각도 정의.
+- `bAutoReturn`: 모든 손을 떼면 0°(중앙)로 자동 복귀. `ReturnSpeed` (deg/s)로 복귀 속도 설정.
+- `MinGrabFingers` (기본 2), `bRequireThumb` (기본 true): 그랩 판정 기준. 매 틱 `UMIPhysicsFingerComponent::ContactActor`를 폴링하여 판정.
+- 매 틱 손바닥(palm) 위치를 **actor-local space**(메시 로컬이 아닌 고정 기준계)에서 atan2로 각도 계산, 이전 프레임과의 delta를 누적. 양손일 때 delta를 평균화.
+- 핸드오프 보존: 오른손→왼손 전환 시 새 손의 `LastHandAngle`을 초기화(첫 delta = 0), `CurrentAngle`은 유지.
+- `TG_PostPhysics`에서 tick (ContactActor가 물리 해결 후 확정된 상태에서 읽기).
+- `OnWheelRotated(Angle, NormalizedValue)`: 매 틱 회전 시 발생. `GetNormalizedValue()`: -1.0~+1.0.
+- `OnHandGrabbed(HandSide)`, `OnHandReleased(HandSide)`: 그랩/릴리즈 이벤트.
+- `OnWheelLocked(bAtPositiveLimit)`: ±MaxLockAngle 도달 시 발생.
+- `SetAngle(float)`, `GetCurrentAngle()`, `IsAnyHandGrabbing()`: Blueprint 호출용 API.
 
 ### Widget
 

@@ -351,29 +351,44 @@ Manus 표준 hand skeleton과 다른 skeleton을 쓸 경우:
 
 ---
 
-### 3-12. 스티어링 휠 (MIPhysicsGrabComponent + PhysicsConstraint)
+### 3-12. 스티어링 휠 (MISteeringWheelComponent)
 
 **Blueprint 생성:**
 1. `BP_SteeringWheel` Actor Blueprint
 2. Components:
-   - `StaticMeshComponent` (스티어링 휠 메시, Simulate Physics = true)
-   - `PhysicsConstraintComponent` (수동 설정 — Twist만 Free, 나머지 Locked)
-   - `MIGrabbableComponent`
+   - `StaticMeshComponent` (스티어링 휠 메시, Simulate Physics = **false**)
+   - `MISteeringWheelComponent`
 
-**MIGrabbableComponent 설정:**
+**MISteeringWheelComponent 설정:**
 
-| 프로퍼티 | 값 |
-|----------|-----|
-| `bIsGrabbable` | true |
-| `bUseGravityWhenReleased` | false |
-| `bUseGravityWhileHeld` | false |
+| 프로퍼티 | 값 | 이유 |
+|----------|-----|------|
+| `LeftHand` | (Physics Hand Left 참조) | 왼손 그랩 감지용 |
+| `RightHand` | (Physics Hand Right 참조) | 오른손 그랩 감지용 |
+| `WheelMesh` | (StaticMeshComponent 참조) | 회전 대상 메시 |
+| `WheelRotationAxis` | X | 휠 칼럼(축) 방향에 따라 X 또는 Z |
+| `MaxLockAngle` | 450 | 좌우 각 450° (1.25회전) |
+| `bAutoReturn` | true | 손 떼면 중앙(0°) 복귀 |
+| `ReturnSpeed` | 180 | 초당 180° 복귀 |
+| `MinGrabFingers` | 2 | 최소 2개 손가락 접촉 시 그랩 |
+| `bRequireThumb` | true | 엄지 접촉 필수 |
 
-**PhysicsConstraint 수동 설정:**
-- Linear X/Y/Z: Locked
-- Swing1/Swing2: Locked
-- Twist: Free (또는 Limited ±540°)
+> 물리 constraint를 사용하지 않고 직접 회전 방식(`SetRelativeRotation`). 양손 동시 조작 및 핸드오프(오른손→왼손 전환 시 각도 유지)를 자연스럽게 지원한다.
 
-> 스티어링 휠은 잡고 돌리는 인터랙션이므로, Grab + Hinge의 조합. MIPhysicsGrabComponent가 Physics Hand에 이미 포함되어 있으므로, 스티어링 휠 Actor에는 MIGrabbableComponent만 추가하면 된다.
+**이벤트 그래프:**
+```
+[MISteeringWheelComponent] OnWheelRotated(Angle, NormalizedValue)
+    │
+    └── Set Vehicle Steering Input = NormalizedValue  (-1.0 ~ +1.0)
+
+[MISteeringWheelComponent] OnHandGrabbed(HandSide)
+    │
+    └── (선택) 그랩 시 시각/사운드 피드백
+
+[MISteeringWheelComponent] OnWheelLocked(bAtPositiveLimit)
+    │
+    └── (선택) 한계각 도달 시 진동/사운드 피드백
+```
 
 ---
 
