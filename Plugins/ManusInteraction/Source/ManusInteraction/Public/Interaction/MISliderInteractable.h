@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Interaction/MIInteractableBase.h"
+class UPhysicsConstraintComponent;
+
 #include "MISliderInteractable.generated.h"
 
 /// @brief Linear slider interactable — movement along one axis with range.

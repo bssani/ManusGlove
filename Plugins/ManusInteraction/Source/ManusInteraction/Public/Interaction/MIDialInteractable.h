@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Interaction/MIInteractableBase.h"
+class UPhysicsConstraintComponent;
+
 #include "MIDialInteractable.generated.h"
 
 /// @brief Dial/knob interactable — rotational control around one axis.

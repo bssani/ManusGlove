@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Interaction/MIInteractableBase.h"
+class UPhysicsConstraintComponent;
+
 #include "MIButtonInteractable.generated.h"
 
 /// @brief Push-button interactable — linear press along one axis.
