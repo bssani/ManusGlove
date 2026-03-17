@@ -7,6 +7,7 @@
 #include "Utils/MITypes.h"
 #include "MIPhysicsHand.generated.h"
 
+class USphereComponent;
 class UManusComponent;
 class UMIPhysicsFingerComponent;
 class UMIHandDriver;
