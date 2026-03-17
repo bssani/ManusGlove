@@ -8,6 +8,8 @@
 UMISteeringWheelComponent::UMISteeringWheelComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	// Run after physics so UMIPhysicsFingerComponent ContactActor is already settled
+	PrimaryComponentTick.TickGroup = TG_PostPhysics;
 }
 
 void UMISteeringWheelComponent::BeginPlay()
@@ -202,7 +204,7 @@ bool UMISteeringWheelComponent::CheckHandGrabbing(AMIPhysicsHand* Hand) const
 
 float UMISteeringWheelComponent::GetHandAngleOnWheel(AMIPhysicsHand* Hand) const
 {
-	if (!Hand || !WheelMesh)
+	if (!Hand || !WheelMesh || !GetOwner())
 	{
 		return 0.0f;
 	}
@@ -212,8 +214,11 @@ float UMISteeringWheelComponent::GetHandAngleOnWheel(AMIPhysicsHand* Hand) const
 	const FVector WorldPos = Palm ? Palm->GetComponentLocation()
 	                               : Hand->GetActorLocation();
 
-	// Transform to wheel mesh local space
-	const FVector LocalPos = WheelMesh->GetComponentTransform().InverseTransformPosition(WorldPos);
+	// IMPORTANT: Use the wheel ACTOR's transform (not the mesh's transform).
+	// The mesh rotates every tick, so its local space rotates with it.
+	// Working in actor-local space gives a fixed reference frame regardless
+	// of how much the wheel mesh has already rotated.
+	const FVector LocalPos = GetOwner()->GetActorTransform().InverseTransformPosition(WorldPos);
 
 	// Project onto the plane perpendicular to the rotation axis and get angle
 	float Angle = 0.0f;
@@ -237,7 +242,7 @@ float UMISteeringWheelComponent::GetHandAngleOnWheel(AMIPhysicsHand* Hand) const
 
 float UMISteeringWheelComponent::GetHandRadiusOnWheel(AMIPhysicsHand* Hand) const
 {
-	if (!Hand || !WheelMesh)
+	if (!Hand || !WheelMesh || !GetOwner())
 	{
 		return 0.0f;
 	}
@@ -246,7 +251,8 @@ float UMISteeringWheelComponent::GetHandRadiusOnWheel(AMIPhysicsHand* Hand) cons
 	const FVector WorldPos = Palm ? Palm->GetComponentLocation()
 	                               : Hand->GetActorLocation();
 
-	const FVector LocalPos = WheelMesh->GetComponentTransform().InverseTransformPosition(WorldPos);
+	// Same as GetHandAngleOnWheel: use actor-local space, not mesh-local space.
+	const FVector LocalPos = GetOwner()->GetActorTransform().InverseTransformPosition(WorldPos);
 
 	switch (WheelRotationAxis)
 	{
