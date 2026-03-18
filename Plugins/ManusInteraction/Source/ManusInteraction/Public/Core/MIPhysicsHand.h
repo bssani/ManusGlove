@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SphereComponent.h"
 #include "Utils/MITypes.h"
 #include "MIPhysicsHand.generated.h"
-
-class USphereComponent;
 class UManusComponent;
 class UMIPhysicsFingerComponent;
 class UMIHandDriver;

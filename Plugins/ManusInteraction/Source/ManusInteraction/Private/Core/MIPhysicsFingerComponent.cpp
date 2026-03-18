@@ -14,8 +14,8 @@ UMIPhysicsFingerComponent::UMIPhysicsFingerComponent(const FObjectInitializer& O
 	SetGenerateOverlapEvents(true);
 	BodyInstance.bNotifyRigidBodyCollision = true;
 
-	// Sphere defaults
-	SetSphereRadius(1.0f);
+	// Sphere defaults — use InitSphereRadius (constructor-safe, does not trigger body setup)
+	InitSphereRadius(1.0f);
 
 	// CCD to prevent tunneling through thin surfaces
 	BodyInstance.bUseCCD = true;
