@@ -48,7 +48,27 @@ Project Settings → Physics:
 
 ### 2-1. Physics Hand Actor 배치
 
-**방법 A: C++ 직접 스폰 (권장)**
+**방법 A: MIPhysicsHandSpawner 컴포넌트 (권장 — Blueprint만으로 완료)**
+
+1. Manus Pawn Blueprint 열기
+2. Components 패널에서 `MIPhysicsHandSpawner` 추가
+3. Details 패널에서 설정:
+
+| 프로퍼티 | 값 | 설명 |
+|----------|-----|------|
+| `LeftManusComponent` | (기존 왼손 UManusComponent 참조) | 드롭다운에서 Pawn의 왼손 컴포넌트 선택 |
+| `RightManusComponent` | (기존 오른손 UManusComponent 참조) | 드롭다운에서 Pawn의 오른손 컴포넌트 선택 |
+| `Config` | (기본값 사용 가능) | 필요시 속도, 반경, 질량 등 조정 |
+| `bShowDebugVisualization` | false | true로 하면 sphere 디버그 표시 |
+
+4. Play 누르면 자동으로:
+   - `AMIPhysicsHand` Actor 2개 스폰
+   - `SourceManusComponent`, `HandSide` 자동 설정
+   - `InitializeHand()` 자동 호출
+
+> 스티어링 휠 등 다른 컴포넌트에서 Physics Hand 참조가 필요하면, `MIPhysicsHandSpawner`의 `LeftPhysicsHand` / `RightPhysicsHand` 프로퍼티를 이벤트 그래프에서 읽으면 된다.
+
+**방법 B: C++ 직접 스폰**
 
 GameMode 또는 Pawn의 BeginPlay에서:
 
@@ -68,7 +88,7 @@ RightPhysHand->HandSide = EMIHandSide::Right;
 RightPhysHand->InitializeHand();
 ```
 
-**방법 B: Blueprint 스폰**
+**방법 C: Blueprint 스폰**
 
 1. 레벨 Blueprint 또는 GameMode Blueprint 열기
 2. BeginPlay에서:

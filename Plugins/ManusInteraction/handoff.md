@@ -68,6 +68,7 @@ Plugins/ManusInteraction/
 │   │   │   └── MITypes.h             # 공통 enum, struct (EMIFingerName, FMIPhysicsHandConfig 등)
 │   │   ├── Core/
 │   │   │   ├── MIPhysicsHand.h       # Physics Hand Actor
+│   │   │   ├── MIPhysicsHandSpawner.h # Physics Hand 자동 스폰 헬퍼
 │   │   │   ├── MIPhysicsFingerComponent.h  # 개별 손가락 sphere body
 │   │   │   └── MIHandDriver.h        # Velocity/Force drive 로직
 │   │   ├── Haptics/
@@ -101,6 +102,15 @@ Plugins/ManusInteraction/
 - `FMIPhysicsHandConfig` struct로 속도, 반경, 질량, damping 등을 일괄 설정한다.
 - `bShowDebugVisualization = true`로 하면 에디터에서 sphere 위치와 kinematic target 사이의 선을 볼 수 있다.
 - 기본 bone 이름은 `SetDefaultBoneNames()`에서 Manus 표준 skeleton 기준으로 설정된다. 다른 skeleton을 쓸 경우 `FingerTipBoneNames` TMap을 직접 설정해야 한다.
+
+**UMIPhysicsHandSpawner** — Physics Hand 자동 스폰 헬퍼
+- `UActorComponent`를 상속. Pawn Blueprint에 추가하면 `BeginPlay`에서 자동으로 `AMIPhysicsHand` 2개를 스폰한다.
+- `LeftManusComponent`, `RightManusComponent`: 기존 Pawn의 `UManusComponent` 참조를 Blueprint Details에서 설정.
+- `Config` (`FMIPhysicsHandConfig`): 양손 공통 물리 설정 (속도, 반경, 질량 등).
+- `LeftPhysicsHand`, `RightPhysicsHand` (BlueprintReadOnly): 스폰된 Physics Hand Actor 참조. 스티어링 휠 등에 연결할 때 사용.
+- `SpawnPhysicsHands()`: `BeginPlay`에서 자동 호출. Late initialization 시 수동 호출 가능.
+- `DestroyPhysicsHands()`: `EndPlay`에서 자동 호출. 스폰된 Actor를 정리.
+- Blueprint만으로 Physics Hand 설정을 완료할 수 있도록 설계됨 (C++ 코드 불필요).
 
 **UMIPhysicsFingerComponent** — 손가락 Sphere
 - USphereComponent를 상속하며 `SimulatePhysics = true`, CCD 활성화.
