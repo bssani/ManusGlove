@@ -67,6 +67,12 @@ ManusInteraction 플러그인: Manus Gloves의 kinematic hand tracking을 UE5 ph
 
 ---
 
+## Git 규칙
+
+- **모든 작업은 `main` 브랜치에 직접 커밋한다.** 별도 feature branch를 만들지 않는다.
+
+---
+
 ## 빌드
 
 - 엔진: Unreal Engine 5.5
