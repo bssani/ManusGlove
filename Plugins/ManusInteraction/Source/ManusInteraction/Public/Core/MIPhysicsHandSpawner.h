@@ -11,9 +11,13 @@ class AMIPhysicsHand;
 class UManusComponent;
 
 /// @brief Helper component that automatically spawns AMIPhysicsHand actors.
-/// Add this to your Manus Pawn Blueprint and assign the left/right
-/// UManusComponent references. On BeginPlay the component spawns two
-/// AMIPhysicsHand actors, configures them, and calls InitializeHand().
+/// Add this to your Manus Pawn Blueprint. On BeginPlay the component
+/// auto-discovers UManusComponent instances on the owning Actor, determines
+/// Left/Right from each component's ManusSkeleton chain setup, spawns two
+/// AMIPhysicsHand actors, and calls InitializeHand().
+///
+/// Manual assignment via LeftManusComponent / RightManusComponent is also
+/// supported; auto-discovery only runs when both are null.
 ///
 /// The spawned hands are accessible via LeftPhysicsHand / RightPhysicsHand
 /// and are automatically destroyed when this component is destroyed.
@@ -30,12 +34,14 @@ public:
 
 	// ── Configuration ──
 
-	/// Left hand Manus skeletal mesh component (from the existing Pawn).
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ManusInteraction|HandSpawner", meta = (UseComponentPicker))
+	/// Left hand Manus skeletal mesh component.
+	/// If left null, auto-discovered from the owning Actor at BeginPlay.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ManusInteraction|HandSpawner")
 	TObjectPtr<UManusComponent> LeftManusComponent;
 
-	/// Right hand Manus skeletal mesh component (from the existing Pawn).
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ManusInteraction|HandSpawner", meta = (UseComponentPicker))
+	/// Right hand Manus skeletal mesh component.
+	/// If left null, auto-discovered from the owning Actor at BeginPlay.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ManusInteraction|HandSpawner")
 	TObjectPtr<UManusComponent> RightManusComponent;
 
 	/// Physics hand configuration applied to both hands.
@@ -69,6 +75,11 @@ public:
 	void DestroyPhysicsHands();
 
 private:
+	/// Auto-discover UManusComponent instances on the owning Actor and
+	/// assign LeftManusComponent / RightManusComponent based on
+	/// ManusSkeleton chain side data.
+	void AutoDiscoverManusComponents();
+
 	AMIPhysicsHand* SpawnSingleHand(UManusComponent* ManusComp, EMIHandSide Side);
 
 	bool bHasSpawned = false;

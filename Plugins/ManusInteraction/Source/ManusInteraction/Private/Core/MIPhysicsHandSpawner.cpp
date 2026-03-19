@@ -3,6 +3,8 @@
 #include "Core/MIPhysicsHandSpawner.h"
 #include "Core/MIPhysicsHand.h"
 #include "ManusComponent.h"
+#include "ManusSkeleton.h"
+#include "ManusBlueprintTypes.h"
 #include "ManusInteraction.h"
 
 UMIPhysicsHandSpawner::UMIPhysicsHandSpawner()
@@ -13,6 +15,13 @@ UMIPhysicsHandSpawner::UMIPhysicsHandSpawner()
 void UMIPhysicsHandSpawner::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Auto-discover if not manually assigned.
+	if (!LeftManusComponent && !RightManusComponent)
+	{
+		AutoDiscoverManusComponents();
+	}
+
 	SpawnPhysicsHands();
 }
 
@@ -20,6 +29,73 @@ void UMIPhysicsHandSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	DestroyPhysicsHands();
 	Super::EndPlay(EndPlayReason);
+}
+
+void UMIPhysicsHandSpawner::AutoDiscoverManusComponents()
+{
+	AActor* Owner = GetOwner();
+	if (!Owner)
+	{
+		return;
+	}
+
+	TArray<UManusComponent*> ManusComps;
+	Owner->GetComponents<UManusComponent>(ManusComps);
+
+	if (ManusComps.Num() == 0)
+	{
+		UE_LOG(LogManusInteraction, Warning,
+			TEXT("MIPhysicsHandSpawner: No UManusComponent found on '%s'. "
+				 "Add ManusComponents to the Actor or assign them manually."),
+			*Owner->GetName());
+		return;
+	}
+
+	for (UManusComponent* Comp : ManusComps)
+	{
+		if (!Comp || !Comp->ManusSkeleton)
+		{
+			continue;
+		}
+
+		// Determine hand side from the skeleton's chain setup.
+		bool bIsRight = false;
+		for (const TPair<FName, FManusChainSetup>& ChainPair : Comp->ManusSkeleton->ChainsIndexMap)
+		{
+			if (ChainPair.Value.Side == EManusSide::Right)
+			{
+				bIsRight = true;
+			}
+			break;
+		}
+
+		if (bIsRight)
+		{
+			if (!RightManusComponent)
+			{
+				RightManusComponent = Comp;
+				UE_LOG(LogManusInteraction, Log,
+					TEXT("MIPhysicsHandSpawner: Auto-assigned Right ManusComponent '%s'."),
+					*Comp->GetName());
+			}
+		}
+		else
+		{
+			if (!LeftManusComponent)
+			{
+				LeftManusComponent = Comp;
+				UE_LOG(LogManusInteraction, Log,
+					TEXT("MIPhysicsHandSpawner: Auto-assigned Left ManusComponent '%s'."),
+					*Comp->GetName());
+			}
+		}
+
+		// Stop if both are found.
+		if (LeftManusComponent && RightManusComponent)
+		{
+			break;
+		}
+	}
 }
 
 void UMIPhysicsHandSpawner::SpawnPhysicsHands()
@@ -34,8 +110,8 @@ void UMIPhysicsHandSpawner::SpawnPhysicsHands()
 	if (!LeftManusComponent && !RightManusComponent)
 	{
 		UE_LOG(LogManusInteraction, Warning,
-			TEXT("MIPhysicsHandSpawner: No ManusComponent assigned. "
-				 "Set LeftManusComponent and/or RightManusComponent in the Details panel."));
+			TEXT("MIPhysicsHandSpawner: No ManusComponent assigned or discovered. "
+				 "Ensure ManusComponents with valid ManusSkeleton are present on the Actor."));
 		return;
 	}
 

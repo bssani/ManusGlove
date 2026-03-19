@@ -51,17 +51,21 @@ Project Settings → Physics:
 **방법 A: MIPhysicsHandSpawner 컴포넌트 (권장 — Blueprint만으로 완료)**
 
 1. Manus Pawn Blueprint 열기
-2. Components 패널에서 `MIPhysicsHandSpawner` 추가
-3. Details 패널에서 설정:
+2. Components 패널에서 `UManusComponent` 2개 추가 (각각 Left/Right ManusSkeleton 할당)
+3. Components 패널에서 `MIPhysicsHandSpawner` 추가
+4. Details 패널에서 설정:
 
 | 프로퍼티 | 값 | 설명 |
 |----------|-----|------|
-| `LeftManusComponent` | (기존 왼손 UManusComponent 참조) | 드롭다운에서 Pawn 내 컴포넌트를 이름으로 선택 (UseComponentPicker) |
-| `RightManusComponent` | (기존 오른손 UManusComponent 참조) | 드롭다운에서 Pawn 내 컴포넌트를 이름으로 선택 (UseComponentPicker) |
+| `LeftManusComponent` | (비워둠 — 자동 탐색) | BeginPlay에서 ManusSkeleton의 chain side 기반으로 자동 매핑 |
+| `RightManusComponent` | (비워둠 — 자동 탐색) | BeginPlay에서 ManusSkeleton의 chain side 기반으로 자동 매핑 |
 | `Config` | (기본값 사용 가능) | 필요시 속도, 반경, 질량 등 조정 |
 | `bShowDebugVisualization` | false | true로 하면 sphere 디버그 표시 |
 
-4. Play 누르면 자동으로:
+> **자동 탐색 동작**: 두 프로퍼티가 모두 비어있으면, BeginPlay에서 Owner Actor의 모든 `UManusComponent`를 검색하고, 각 컴포넌트의 `ManusSkeleton->ChainsIndexMap`에서 `EManusSide::Right` chain이 있으면 오른손, 없으면 왼손으로 자동 판별한다. 수동으로 할당해도 동작한다.
+
+5. Play 누르면 자동으로:
+   - Owner Actor에서 ManusComponent 자동 탐색 (미할당 시)
    - `AMIPhysicsHand` Actor 2개 스폰
    - `SourceManusComponent`, `HandSide` 자동 설정
    - `InitializeHand()` 자동 호출

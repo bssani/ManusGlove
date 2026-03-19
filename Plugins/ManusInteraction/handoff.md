@@ -105,12 +105,13 @@ Plugins/ManusInteraction/
 
 **UMIPhysicsHandSpawner** — Physics Hand 자동 스폰 헬퍼
 - `UActorComponent`를 상속. Pawn Blueprint에 추가하면 `BeginPlay`에서 자동으로 `AMIPhysicsHand` 2개를 스폰한다.
-- `LeftManusComponent`, `RightManusComponent`: 기존 Pawn의 `UManusComponent` 참조를 Blueprint Details에서 설정. `UseComponentPicker` 메타 지정으로 같은 Actor 내 컴포넌트를 이름으로 선택 가능.
+- **자동 탐색 (기본 동작)**: `LeftManusComponent`/`RightManusComponent`가 둘 다 null이면, `BeginPlay`에서 `AutoDiscoverManusComponents()`를 호출하여 Owner Actor의 `UManusComponent`들을 자동 탐색한다. 각 `ManusSkeleton->ChainsIndexMap`의 `Side` 값(`EManusSide::Left`/`Right`)으로 Left/Right를 판별한다.
+- **수동 설정**: Blueprint Details에서 `LeftManusComponent`/`RightManusComponent`를 직접 할당할 수도 있다. 하나라도 할당되어 있으면 자동 탐색을 건너뛴다.
 - `Config` (`FMIPhysicsHandConfig`): 양손 공통 물리 설정 (속도, 반경, 질량 등).
 - `LeftPhysicsHand`, `RightPhysicsHand` (BlueprintReadOnly): 스폰된 Physics Hand Actor 참조. 스티어링 휠 등에 연결할 때 사용.
 - `SpawnPhysicsHands()`: `BeginPlay`에서 자동 호출. Late initialization 시 수동 호출 가능.
 - `DestroyPhysicsHands()`: `EndPlay`에서 자동 호출. 스폰된 Actor를 정리.
-- Blueprint만으로 Physics Hand 설정을 완료할 수 있도록 설계됨 (C++ 코드 불필요).
+- Blueprint만으로 Physics Hand 설정을 완료할 수 있도록 설계됨 (C++ 코드 불필요). ManusComponent를 Pawn에 추가하고 MIPhysicsHandSpawner만 붙이면 수동 설정 없이 동작한다.
 
 **UMIPhysicsFingerComponent** — 손가락 Sphere
 - USphereComponent를 상속하며 `SimulatePhysics = true`, CCD 활성화.

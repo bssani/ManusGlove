@@ -72,4 +72,5 @@ ManusInteraction 플러그인: Manus Gloves의 kinematic hand tracking을 UE5 ph
 - 엔진: Unreal Engine 5.5
 - 플랫폼: Win64 only (Manus SDK 제약)
 - 플러그인 소스: `Plugins/ManusInteraction/Source/ManusInteraction/`
-- Manus Core Plugin (`Plugins/Manus/`)은 수정하지 않는다
+- Manus Core Plugin (`Plugins/Manus/`)은 원칙적으로 수정하지 않는다
+- **예외 패치**: `ManusComponent.cpp:204` — `InitManusReplicatorID()`에서 `GetOwner()` null 크래시 수정 (null guard 추가). Manus 플러그인 업데이트 시 재적용 필요.
