@@ -56,8 +56,8 @@ Project Settings → Physics:
 
 | 프로퍼티 | 값 | 설명 |
 |----------|-----|------|
-| `LeftManusComponent` | (기존 왼손 UManusComponent 참조) | 드롭다운에서 Pawn의 왼손 컴포넌트 선택 |
-| `RightManusComponent` | (기존 오른손 UManusComponent 참조) | 드롭다운에서 Pawn의 오른손 컴포넌트 선택 |
+| `LeftManusComponent` | (기존 왼손 UManusComponent 참조) | 드롭다운에서 Pawn 내 컴포넌트를 이름으로 선택 (UseComponentPicker) |
+| `RightManusComponent` | (기존 오른손 UManusComponent 참조) | 드롭다운에서 Pawn 내 컴포넌트를 이름으로 선택 (UseComponentPicker) |
 | `Config` | (기본값 사용 가능) | 필요시 속도, 반경, 질량 등 조정 |
 | `bShowDebugVisualization` | false | true로 하면 sphere 디버그 표시 |
 

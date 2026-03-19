@@ -31,11 +31,11 @@ public:
 	// ── Configuration ──
 
 	/// Left hand Manus skeletal mesh component (from the existing Pawn).
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ManusInteraction|HandSpawner")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ManusInteraction|HandSpawner", meta = (UseComponentPicker))
 	TObjectPtr<UManusComponent> LeftManusComponent;
 
 	/// Right hand Manus skeletal mesh component (from the existing Pawn).
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ManusInteraction|HandSpawner")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ManusInteraction|HandSpawner", meta = (UseComponentPicker))
 	TObjectPtr<UManusComponent> RightManusComponent;
 
 	/// Physics hand configuration applied to both hands.

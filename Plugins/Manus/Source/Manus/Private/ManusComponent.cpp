@@ -201,6 +201,7 @@ bool UManusComponent::ComponentOverlapMultiImpl(TArray<FOverlapResult>& OutOverl
 
 void UManusComponent::InitManusReplicatorID()
 {
+	if (!GetOwner()) return;
 	if (GetOwner()->HasAuthority() && ManusReplicatorId == 0)
 	{
 		UNetConnection* NetConnection = GetOwner()->GetNetConnection();

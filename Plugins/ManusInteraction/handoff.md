@@ -105,7 +105,7 @@ Plugins/ManusInteraction/
 
 **UMIPhysicsHandSpawner** — Physics Hand 자동 스폰 헬퍼
 - `UActorComponent`를 상속. Pawn Blueprint에 추가하면 `BeginPlay`에서 자동으로 `AMIPhysicsHand` 2개를 스폰한다.
-- `LeftManusComponent`, `RightManusComponent`: 기존 Pawn의 `UManusComponent` 참조를 Blueprint Details에서 설정.
+- `LeftManusComponent`, `RightManusComponent`: 기존 Pawn의 `UManusComponent` 참조를 Blueprint Details에서 설정. `UseComponentPicker` 메타 지정으로 같은 Actor 내 컴포넌트를 이름으로 선택 가능.
 - `Config` (`FMIPhysicsHandConfig`): 양손 공통 물리 설정 (속도, 반경, 질량 등).
 - `LeftPhysicsHand`, `RightPhysicsHand` (BlueprintReadOnly): 스폰된 Physics Hand Actor 참조. 스티어링 휠 등에 연결할 때 사용.
 - `SpawnPhysicsHands()`: `BeginPlay`에서 자동 호출. Late initialization 시 수동 호출 가능.
@@ -243,6 +243,8 @@ Plugins/ManusInteraction/
 6. **Grab 안정성**: 작은 물체나 고속 이동 시 grab constraint가 떨릴 수 있음. `GrabStiffness`, `GrabDamping` 튜닝 필요.
 
 7. **성능**: 양손 = 12개 physics body (10 finger + 2 palm). 인터랙터블 수가 많으면 overlap query 비용 증가. `MISurfaceInteractable`은 매 틱 `GetAllActorsOfClass`를 호출하는데, 프로덕션에서는 캐싱 또는 proximity 기반으로 최적화 필요.
+
+8. **UManusComponent Owner null 크래시**: `InitManusReplicatorID()`에서 `GetOwner()`가 nullptr일 때 크래시가 발생했음. null guard를 추가하여 수정 (`ManusComponent.cpp:204`). Manus Core Plugin 코드 수정이므로 Manus 플러그인 업데이트 시 패치가 덮어씌워질 수 있음에 유의.
 
 ---
 
